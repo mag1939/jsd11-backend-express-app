@@ -1,9 +1,9 @@
 ### GET request to read all users
-GET http://localhost:3000/users
+GET http://localhost:3000/api/v1/users
 
 
 ### POST request to create new users
-POST http://localhost:3000/users
+POST http://localhost:3000/api/v1/users
 Content-Type: application/json
 
 {
@@ -12,4 +12,4 @@ Content-Type: application/json
 }
 
 ### DELETE request
-DELETE http://localhost:3000/users/2
+DELETE http://localhost:3000/api/v1/users/4
