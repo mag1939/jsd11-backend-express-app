@@ -6,7 +6,7 @@ export async function connectDB(){
     const uri = process.env.MONGODB_URI;
 
     try {
-        // wait for this line to finish first, it try to connecto to the mongoDB database name "..." if we don't have it, it'll create and connect to it.
+        // a"wait" for this line to finish first, it try to connecto to the mongoDB database name "..." if we don't have it, it'll create and connect to it.
         await mongoose.connect(uri, {dbName: "jsd11-express-app-mag38"});
         console.log(chalk.greenBright("MongoDB connected ✅"))
     } catch (error) {

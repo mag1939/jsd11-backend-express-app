@@ -7,7 +7,7 @@ import {
 
 export const router = Router();
 
-// router.get("/test", testAPI);
+router.get("/test", testAPI);
 router.get("/", getUsers);
 router.post("/", createUser);
 router.delete("/:id", deleteUser);

@@ -7,7 +7,7 @@ const port = 3000;
 
 
 try {
-    // wait till this function finished
+    // a"wait" till this function finished, if not terminate it.
     await connectDB()
 
     // let our app.js run on port:....

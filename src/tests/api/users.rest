@@ -7,8 +7,9 @@ POST http://localhost:3000/api/v1/users
 Content-Type: application/json
 
 {
-    "name": "Mom",
-    "email": "mom@example.com"
+    "username": "เชร็ค",
+    "email": "SHrek@example.com",
+    "password": "shrek1234"
 }
 
 ### DELETE request

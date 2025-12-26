@@ -1,7 +1,12 @@
+import mongoose from "mongoose";
 import { users } from "../../mock-db/users.js";
+import { User } from "./users.model.js";
+import { json } from "express";
 
 // Refactored GET /users endpoint to implement separation of concerns (SOC)
 // The all of functions in this file is called "Route Handler / Controller"
+
+
 export const testAPI = (req, res) => {
     res.send(`
         <!doctype html>
@@ -37,9 +42,25 @@ export const testAPI = (req, res) => {
     `);
 }
 
-export const getUsers = (req, res) => {
+// ❌ route handler: get all users (mock)
+export const getUsers2 = (req, res) => {
     res.status(200).json(users);
     // console.log(res);
+}
+
+// ❌ route handler: create a new user (mock)
+export const createUser2 = (req, res) => {
+    // req.body ข้อมูลที่มาจาก body ต้องเป็ฯในรูปแบบ JS lang เพราะฉะนั้นอย่าลืมแปลงจาก json เป็น JS
+    const {name, email} = req.body;
+
+    const newUser = {
+        id: String(users.length + 1),
+        name: name,
+        email: email
+    };
+
+    users.push(newUser);
+    res.status(201).json(newUser);
 }
 
 export const deleteUser = (req, res) => {
@@ -55,16 +76,58 @@ export const deleteUser = (req, res) => {
     }
 }
 
-export const createUser = (req, res) => {
-    // req.body ข้อมูลที่มาจาก body ต้องเป็ฯในรูปแบบ JS lang เพราะฉะนั้นอย่าลืมแปลงจาก json เป็น JS
-    const {name, email} = req.body
+// ✅ route handler: get all users in the database
+export const getUsers = async (req, res) => {
+    try {
+        const users = await User.find().select("-password");
 
-    const newUser = {
-        id: String(users.length + 1),
-        name: name,
-        email: email
-    };
+        return res.status(200).json({
+            success: true,
+            data: users,
+        });
+    } catch (error) {
+        return res.status(500),json({
+            success: false,
+            error: "Failed to get users..."
+        });
+    }
+}
 
-    users.push(newUser);
-    res.status(201).json(newUser);
+// ✅ route handler: create a new user in the database
+export const createUser = async (req, res) => {
+    const {username, email, password} = req.body;
+
+    if (!username || !email || !password) {
+        return res.status(400).json({
+                success: false,
+                error: "Username, email and password are required.",
+        });
+    }
+
+    try {
+        // await ถ้าไม่ผ่านก็จะข้ามไป catch error ทันที
+        // ถ้าสำเร็จก็ สร้าง document ส่งไปที่ database -> collection "users"
+        const doc = await User.create({username, email, password});
+
+        // แปลง doc ที่ได้มาดลับเป็น js แล้วแก้ไขด้วยการลบ password ทิ้งก่อน ระแวงเพื่อความปลอดภัย ก่อน return เป็น json กลับมา
+        const safe = doc.toObject();
+        delete safe.password;
+
+        return res.status(200).json({
+                success: true,
+                data: safe,
+            });
+    } catch (error) {
+        if (error.code === 11000) {
+            return res.status(409).json({
+                    success: false,
+                    error: "Email already in use.",
+                });
+        }
+
+        return res.status(500).json({
+                success: false,
+                error: "Failed to create user.",
+            });
+    }
 }
